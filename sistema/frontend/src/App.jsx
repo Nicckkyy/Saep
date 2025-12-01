@@ -1,24 +1,19 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/login";
-
-// Vamos criar esses componentes em breve, mas já deixamos a rota pronta
-const Dashboard = () => <h2>Bem-vindo ao Sistema (Em construção)</h2>;
+import Dashboard from "./pages/Dashboard";
+import Produtos from "./pages/Produtos";
+import Estoque from "./pages/estoque";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/produtos" element={<Produtos />} />
+        <Route path="/estoque" element={<Estoque />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 

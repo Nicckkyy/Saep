@@ -1,64 +1,72 @@
-import React, { useState } from "react";
-import api from "../api";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
+import "../css/Login.css";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
   const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      [cite_start]; // Tenta logar na nossa API Python [cite: 53]
-      const response = await api.post("/login/", { email, senha });
+    setErro("");
+    setCarregando(true);
 
-      // Se der certo, salva os dados e vai para o dashboard
-      localStorage.setItem("usuario", JSON.stringify(response.data));
+    try {
+      const response = await api.post("/login/", { username, password });
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
+      localStorage.setItem("usuario_nome", response.data.nome);
+      localStorage.setItem("usuario_id", response.data.id);
       navigate("/dashboard");
     } catch (error) {
-      setErro("Falha na autenticação: Verifique seus dados.");
-      setSenha("");
+      setErro(error.response?.data?.error || "Erro de conexão.");
+    } finally {
+      setCarregando(false);
     }
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        marginTop: "50px",
-      }}
-    >
-      <h2>Login do Almoxarifado</h2>
-      <form
-        onSubmit={handleLogin}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "300px",
-          gap: "10px",
-        }}
-      >
-        <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          required
-        />
-        <button type="submit">Entrar</button>
-      </form>
-      {erro && <p style={{ color: "red" }}>{erro}</p>}
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">Bem-vindo</h2>
+        <p className="login-subtitle">Acesso ao Sistema SAEP</p>
+
+        {erro && <div className="error-message">{erro}</div>}
+
+        <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label className="form-label">Usuário</label>
+            <input
+              type="text"
+              placeholder="Ex: admin"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Senha</label>
+            <input
+              type="password"
+              placeholder="Sua senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="form-input"
+            />
+          </div>
+
+          <button type="submit" className="btn-login" disabled={carregando}>
+            {carregando ? "Entrando..." : "Acessar Sistema"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

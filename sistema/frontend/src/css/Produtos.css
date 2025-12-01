@@ -1,0 +1,177 @@
+/* Container principal com o gradiente roxo/azul padrão */
+.produtos-container {
+    min-height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
+/* Card branco centralizado */
+.produtos-card {
+    background: white;
+    width: 100%;
+    max-width: 1000px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    padding: 30px;
+    margin-top: 20px;
+}
+
+/* Cabeçalho (Botão voltar, Título, Usuário) */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+.title {
+    color: #333;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.user-info {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* Área cinza do formulário de cadastro */
+.form-wrapper {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.sub-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #667eea; /* Cor do tema */
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* Grid para os inputs ficarem alinhados */
+.input-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr; /* Nome e Descrição maiores, Preço e Estoque menores */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Estilo dos Inputs */
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border 0.3s;
+    background-color: white;
+}
+
+.input-field:focus {
+    border-color: #667eea;
+}
+
+/* Botões Gerais */
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* Cores específicas dos botões */
+.btn-voltar { background: #e0e0e0; color: #333; padding: 8px 15px; }
+.btn-success { background: #28a745; width: 100%; max-width: 200px; }
+.btn-warning { background: #ffc107; color: #000; } /* Amarelo para editar */
+.btn-danger { background: #dc3545; } /* Vermelho para excluir/cancelar */
+
+/* Campo de busca */
+.search-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+/* --- Tabela --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.data-table th {
+    background: #f1f1f1;
+    padding: 14px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+    color: #555;
+    font-weight: 700;
+}
+
+.data-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    vertical-align: middle;
+}
+
+.data-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Botões pequenos dentro da tabela */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Responsividade simples para telas menores */
+@media (max-width: 768px) {
+    .input-grid {
+        grid-template-columns: 1fr; /* Inputs um embaixo do outro no celular */
+    }
+    .header-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
