@@ -1,154 +1,123 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
 import "../css/Estoque.css";
 
 function Estoque() {
   const navigate = useNavigate();
-  const nomeUsuario = localStorage.getItem("usuario_nome") || "Usuário";
-  const [produtos, setProdutos] = useState([]);
-  const [movimentacao, setMovimentacao] = useState({
-    produto_id: "",
-    tipo: "entrada",
-    quantidade: 0,
-    data: "",
-  });
 
-  useEffect(() => {
-    carregarProdutos();
-  }, []);
+  const [produtos, setProdutos] = useState([
+    { id: 1, nome: "Martelo de Unha", estoque: 50, minimo: 10 },
+    { id: 2, nome: "Chave de Fenda", estoque: 8, minimo: 5 }, 
+    { id: 3, nome: "Alicate Universal", estoque: 20, minimo: 8 },
+    { id: 4, nome: "Serrote Profissional", estoque: 15, minimo: 5 },
+  ]);
 
-  const carregarProdutos = async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await api.get("/produtos/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProdutos(response.data.sort((a, b) => a.nome.localeCompare(b.nome)));
-    } catch (error) {
-      alert("Erro ao carregar lista de produtos.");
-    }
-  };
+  const [idProduto, setIdProduto] = useState("");
+  const [tipo, setTipo] = useState("entrada");
+  const [quantidade, setQuantidade] = useState("");
+  const [dataMov, setDataMov] = useState("");
 
-  const handleSubmit = async (e) => {
+  const produtosOrdenados = [...produtos].sort((a, b) => 
+    a.nome.localeCompare(b.nome)
+  );
+
+  const handleMovimentacao = (e) => {
     e.preventDefault();
-    if (
-      !movimentacao.produto_id ||
-      movimentacao.quantidade <= 0 ||
-      !movimentacao.data
-    )
-      return alert("Preencha corretamente.");
 
-    const usuarioId = localStorage.getItem("usuario_id");
-    if (!usuarioId) {
-      navigate("/");
+    if (!idProduto || !quantidade || !dataMov) {
+      alert("Preencha todos os campos!");
       return;
     }
 
-    try {
-      const token = localStorage.getItem("access_token");
-      const response = await api.post(
-        "/estoque/movimentar/",
-        {
-          produto: movimentacao.produto_id,
-          usuario: usuarioId,
-          tipo: movimentacao.tipo,
-          quantidade: movimentacao.quantidade,
-          data_movimentacao: movimentacao.data,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    const qtd = parseInt(quantidade);
+    const produtoIndex = produtos.findIndex(p => p.id === parseInt(idProduto));
+    const produto = produtos[produtoIndex];
 
-      alert(
-        response.data.alerta_estoque_baixo
-          ? "⚠️ ATENÇÃO: Estoque abaixo do mínimo!"
-          : "Movimentação registrada com sucesso!"
-      );
-      navigate("/dashboard");
-    } catch (error) {
-      alert("Erro ao registrar movimentação.");
+    if (tipo === "entrada") {
+      const novosProdutos = [...produtos];
+      novosProdutos[produtoIndex].estoque += qtd;
+      setProdutos(novosProdutos);
+      alert(`Entrada de ${qtd} unidades registrada com sucesso!`);
+    } else {
+      if (produto.estoque < qtd) {
+        alert("Erro: Quantidade indisponível em estoque!");
+        return;
+      }
+      const novoEstoque = produto.estoque - qtd;
+      if (novoEstoque < produto.minimo) {
+        alert(`⚠️ ALERTA: O produto "${produto.nome}" ficou abaixo do estoque mínimo!\nSaldo Atual: ${novoEstoque} (Mínimo: ${produto.minimo})`);
+      } else {
+        alert(`Saída de ${qtd} unidades registrada.`);
+      }
+      const novosProdutos = [...produtos];
+      novosProdutos[produtoIndex].estoque = novoEstoque;
+      setProdutos(novosProdutos);
     }
+    setQuantidade("");
+    setDataMov("");
   };
 
   return (
-    <div className="page-container">
-      <div className="card-form">
-        <div className="header-row">
-          <button className="btn-voltar" onClick={() => navigate("/dashboard")}>
-            ← Voltar
-          </button>
-          <div style={{ fontWeight: "bold", fontSize: "18px", color: "#333" }}>
-            Gestão
-          </div>
-          <div className="user-info">👤 {nomeUsuario}</div>
-        </div>
+    <div className="estoque-container">
+      <div className="estoque-card">
+        
+        <header className="estoque-header">
+          <button className="btn-voltar" onClick={() => navigate("/dashboard")}>← Voltar</button>
+          <h2 className="estoque-title">Gestão de Estoque</h2>
+        </header>
 
-        <h2 className="page-title">Movimentação de Estoque</h2>
-
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleMovimentacao}>
           <div className="form-group">
-            <label className="form-label">Produto:</label>
-            <select
-              className="form-control"
-              value={movimentacao.produto_id}
-              onChange={(e) =>
-                setMovimentacao({ ...movimentacao, produto_id: e.target.value })
-              }
-              required
+            <label>Produto:</label>
+            <select 
+              className="estoque-select"
+              value={idProduto} 
+              onChange={(e) => setIdProduto(e.target.value)}
             >
               <option value="">Selecione...</option>
-              {produtos.map((p) => (
+              {produtosOrdenados.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.nome} (Estoque: {p.quantidade_estoque})
+                  {p.nome} (Saldo: {p.estoque})
                 </option>
               ))}
             </select>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Tipo de Movimentação:</label>
-            <select
-              className="form-control"
-              value={movimentacao.tipo}
-              onChange={(e) =>
-                setMovimentacao({ ...movimentacao, tipo: e.target.value })
-              }
+            <label>Tipo de Movimentação:</label>
+            <select 
+              className="estoque-select"
+              value={tipo} 
+              onChange={(e) => setTipo(e.target.value)}
             >
-              <option value="entrada">Entrada</option>
-              <option value="saida">Saída</option>
+              <option value="entrada">Entrada (+)</option>
+              <option value="saida">Saída (-)</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Quantidade:</label>
-            <input
-              className="form-control"
-              type="number"
+            <label>Quantidade:</label>
+            <input 
+              type="number" 
+              placeholder="0" 
+              className="estoque-input"
+              value={quantidade}
+              onChange={(e) => setQuantidade(e.target.value)}
               min="1"
-              value={movimentacao.quantidade}
-              onChange={(e) =>
-                setMovimentacao({ ...movimentacao, quantidade: e.target.value })
-              }
-              required
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Data:</label>
-            <input
-              className="form-control"
-              type="datetime-local"
-              value={movimentacao.data}
-              onChange={(e) =>
-                setMovimentacao({ ...movimentacao, data: e.target.value })
-              }
-              required
+            <label>Data:</label>
+            <input 
+              type="date" 
+              className="estoque-input"
+              value={dataMov}
+              onChange={(e) => setDataMov(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="btn-registrar">
-            Registrar Movimentação
-          </button>
+          <button type="submit" className="btn-confirmar">Registrar Movimentação</button>
         </form>
       </div>
     </div>
